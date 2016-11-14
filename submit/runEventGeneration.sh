@@ -12,8 +12,9 @@ export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
 source inputs.sh
 BASE=/cms/store/user/${USERNAME}
-echo "Generating mediator mass " ${MASS}
+
 #
+#############
 #############
 # make a working area
 
@@ -71,7 +72,7 @@ ls -lhrt
 #############
 # Generate GEN-SIM
 
-cmsDriver.py Configuration/GenProduction/python/${HADRONIZER} --filein file:${outfilename}.lhe --fileout file:${outfilename}_gensim.root --mc --eventcontent RAWSIM --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1,Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --conditions MCRUN2_71_V1::All --beamspot Realistic50ns13TeVCollision --step GEN,SIM --magField 38T_PostLS1 --python_filename ${outfilename}_gensim.py --no_exec -n 10
+cmsDriver.py Configuration/GenProduction/python/${HADRONIZER} --filein file:${outfilename}.lhe --fileout file:${outfilename}_gensim.root --mc --eventcontent RAWSIM --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1,Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --conditions MCRUN2_71_V1::All --beamspot Realistic50ns13TeVCollision --step GEN,SIM --magField 38T_PostLS1 --python_filename ${outfilename}_gensim.py --no_exec -n 5
 
 cmsRun ${outfilename}_gensim.py
 
@@ -111,17 +112,20 @@ cmsRun ${outfilename}_miniaod_cfg.py
 
 ls -lrht
 
-lcg-cp -v -D srmv2 -b file://$PWD/${outfilename}_miniaod.root srm://t3serv006.mit.edu:8443/${BASE}/$USERNAME/$PROCESS/${outfilename}_miniaod.root
-
-tar xf ${BASEDIR}/input/copy.tar
-
-./cmscp.py \
-  --debug \
-  --destination srm://$SERVER:8443/${BASE}/$USERNAME/$PROCESS \
-  --inputFileList ${outfilename}_miniaod.root \
-  --middleware OSG \
-  --PNN $SERVER \
-  --se_name $SERVER \
-  --for_lfn ${USERNAME}/${PROCESS}
+if [[ $HOSTNAME =~ t3*.mit.edu ]]
+then
+    mkdir -p ${BASE}/$USERNAME/$PROCESS
+    chmod 777 ${BASE}/$USERNAME/$PROCESS
+    cp ${outfilename}_miniaod.root ${BASE}/$USERNAME/$PROCESS
+elif which lcg-cp
+then
+    lcg-cp -v -D srmv2 -b file://$PWD/${outfilename}_miniaod.root srm://t3serv006.mit.edu:8443/srm/v2/server?SFN=${BASE}/$USERNAME/$PROCESS/${outfilename}_miniaod.root
+elif which gfal-copy
+then
+    gfal-copy file://$PWD/${outfilename}_miniaod.root srm://t3serv006.mit.edu:8443/srm/v2/server?SFN=${BASE}/$USERNAME/$PROCESS/${outfilename}_miniaod.root
+else
+    echo "No way to copy something."
+    exit 1
+fi
 
 echo "DONE."
