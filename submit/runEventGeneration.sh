@@ -44,8 +44,17 @@ sed -i 's/exit 0//g' runcmsgrid.sh
 
 ls -lhrt
 
-RANDOMSEED=`od -vAn -N4 -tu4 < /dev/urandom`
-RANDOMSEED=${RANDOM}
+#RANDOMSEED=`od -vAn -N4 -tu4 < /dev/urandom`
+#RANDOMSEED=${RANDOM}
+
+RANDOMSEED1=${RANDOM}
+RANDOMSEED2=${RANDOM}
+
+RANDOMSEED="$((RANDOMSEED1 * RANDOMSEED2))"
+
+if [ ${#RANDOMSEED} -gt "4" ];then
+    RANDOMSEED=`echo $RANDOMSEED | rev | cut -c 4- | rev`
+fi
 
 . runcmsgrid.sh 1000 ${RANDOMSEED} 1
 
@@ -62,7 +71,7 @@ ls -lhrt
 #############
 # Generate GEN-SIM
 
-cmsDriver.py Configuration/GenProduction/python/${HADRONIZER} --filein file:${outfilename}.lhe --fileout file:${outfilename}_gensim.root --mc --eventcontent RAWSIM --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1,Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --conditions MCRUN2_71_V1::All --beamspot Realistic50ns13TeVCollision --step GEN,SIM --magField 38T_PostLS1 --python_filename ${outfilename}_gensim.py --no_exec -n 1
+cmsDriver.py Configuration/GenProduction/python/${HADRONIZER} --filein file:${outfilename}.lhe --fileout file:${outfilename}_gensim.root --mc --eventcontent RAWSIM --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1,Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --conditions MCRUN2_71_V1::All --beamspot Realistic50ns13TeVCollision --step GEN,SIM --magField 38T_PostLS1 --python_filename ${outfilename}_gensim.py --no_exec -n 10
 
 cmsRun ${outfilename}_gensim.py
 
@@ -76,8 +85,6 @@ scram p CMSSW CMSSW_8_0_21
 cd CMSSW_8_0_21/src
 eval `scram runtime -sh`
 cd -
-
-#cmsDriver.py step1 --filein file:${outfilename}_gensim.root --fileout file:${outfilename}_step1.root  --pileup_input "dbs:/Neutrino_E-10_gun/RunIISpring15PrePremix-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v2-v2/GEN-SIM-DIGI-RAW" --mc --eventcontent PREMIXRAW --datatier GEN-SIM-RAW --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --step DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,HLT:@frozen2016 --nThreads 1 --datamix PreMix --era Run2_2016 --python_filename ${outfilename}_1_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n 1000
 
 cp ${BASEDIR}/input/pu_files.py .
 cp ${BASEDIR}/input/aod_template.py .
@@ -104,6 +111,8 @@ cmsRun ${outfilename}_miniaod_cfg.py
 
 ls -lrht
 
+lcg-cp -v -D srmv2 -b file://$PWD/${outfilename}_miniaod.root srm://t3serv006.mit.edu:8443/${BASE}/$USERNAME/$PROCESS/${outfilename}_miniaod.root
+
 tar xf ${BASEDIR}/input/copy.tar
 
 ./cmscp.py \
@@ -115,4 +124,4 @@ tar xf ${BASEDIR}/input/copy.tar
   --se_name $SERVER \
   --for_lfn ${USERNAME}/${PROCESS}
 
-ls -l
+echo "DONE."
