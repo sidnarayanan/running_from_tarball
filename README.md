@@ -1,5 +1,7 @@
 # Running from Tarball
 
+This is a small tool to privately generate events for Moriond17 analyses.
+
 ## Installation
 
 1. Put your tarball (containing a `runcmsgrid.sh`) into the `inputs/` folder together with an appropriate hadronizer.
