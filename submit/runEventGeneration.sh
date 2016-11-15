@@ -11,7 +11,7 @@ export BASEDIR=`pwd`
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
 source inputs.sh
-BASE=/cms/store/user/${USERNAME}
+BASE=/mnt/hadoop/cms/store/user/${USERNAME}
 
 #
 #############
@@ -114,15 +114,15 @@ ls -lrht
 
 if [[ $HOSTNAME =~ t3*.mit.edu ]]
 then
-    mkdir -p ${BASE}/$USERNAME/$PROCESS
-    chmod 777 ${BASE}/$USERNAME/$PROCESS
-    cp ${outfilename}_miniaod.root ${BASE}/$USERNAME/$PROCESS
+    mkdir -p ${BASE}/moriond17/$PROCESS
+    chmod 777 ${BASE}/moriond17/$PROCESS
+    cp ${outfilename}_miniaod.root ${BASE}/moriond17/$PROCESS
 elif which lcg-cp
 then
-    lcg-cp -v -D srmv2 -b file://$PWD/${outfilename}_miniaod.root srm://t3serv006.mit.edu:8443/srm/v2/server?SFN=${BASE}/$USERNAME/$PROCESS/${outfilename}_miniaod.root
+    lcg-cp -v -D srmv2 -b file://$PWD/${outfilename}_miniaod.root srm://t3serv006.mit.edu:8443/srm/v2/server?SFN=${BASE}/moriond17/$PROCESS/${outfilename}_miniaod.root
 elif which gfal-copy
 then
-    gfal-copy file://$PWD/${outfilename}_miniaod.root srm://t3serv006.mit.edu:8443/srm/v2/server?SFN=${BASE}/$USERNAME/$PROCESS/${outfilename}_miniaod.root
+    gfal-copy file://$PWD/${outfilename}_miniaod.root srm://t3serv006.mit.edu:8443/srm/v2/server?SFN=${BASE}/moriond17/$PROCESS/${outfilename}_miniaod.root
 else
     echo "No way to copy something."
     exit 1
