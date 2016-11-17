@@ -10,6 +10,7 @@ echo "TARBALL=${1}_tarball.tar.xz" > ./submit/inputs.sh
 echo "HADRONIZER=${1}_hadronizer.py" >> ./submit/inputs.sh
 echo "PROCESS=${1}" >> ./submit/inputs.sh
 echo "USERNAME=${USER}" >> ./submit/inputs.sh
+mkdir -p ./submit/input/
 cp inputs/${1}_tarball.tar.xz ./submit/input/
 cp inputs/${1}_hadronizer.py ./submit/input/
 cp inputs/copy.tar ./submit/input/
