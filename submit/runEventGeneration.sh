@@ -57,7 +57,7 @@ if [ ${#RANDOMSEED} -gt "4" ];then
     RANDOMSEED=`echo $RANDOMSEED | rev | cut -c 4- | rev`
 fi
 
-. runcmsgrid.sh 1000 ${RANDOMSEED} 1
+. runcmsgrid.sh 250 ${RANDOMSEED} 1
 
 
 outfilename_tmp="$PROCESS"'_'"$RANDOMSEED"
@@ -110,22 +110,45 @@ cmsDriver.py step1 --filein file:${outfilename}_aod.root --fileout file:${outfil
 
 cmsRun ${outfilename}_miniaod_cfg.py
 
+
+#
+###########
+###########
+# Stage out
+
+#v1
+tar xf $BASEDIR/input/copy.tar
+
+# define base output location
+REMOTE_SERVER="se01.cmsaf.mit.edu"
+REMOTE_BASE="srm/v2/server?SFN=/mnt/hadoop/cms/store"
+REMOTE_USER_DIR="/user/bmaier/moriond17/$PROCESS"
+
+
 ls -lrht
 
-if [[ $HOSTNAME =~ t3*.mit.edu ]]
-then
-    mkdir -p ${BASE}/moriond17/$PROCESS
-    chmod 777 ${BASE}/moriond17/$PROCESS
-    cp ${outfilename}_miniaod.root ${BASE}/moriond17/$PROCESS
-elif which lcg-cp
-then
-    lcg-cp -v -D srmv2 -b file://$PWD/${outfilename}_miniaod.root srm://t3serv006.mit.edu:8443/srm/v2/server?SFN=${BASE}/moriond17/$PROCESS/${outfilename}_miniaod.root
-elif which gfal-copy
-then
-    gfal-copy file://$PWD/${outfilename}_miniaod.root srm://t3serv006.mit.edu:8443/srm/v2/server?SFN=${BASE}/moriond17/$PROCESS/${outfilename}_miniaod.root
-else
-    echo "No way to copy something."
-    exit 1
-fi
+./cmscp.py \
+    --middleware OSG --PNN $REMOTE_SERVER --se_name $REMOTE_SERVER \
+    --inputFileList $PWD/${outfilename}_miniaod.root \
+    --destination srm://$REMOTE_SERVER:8443/${REMOTE_BASE}${REMOTE_USER_DIR} \
+    --for_lfn ${REMOTE_USER_DIR} 
+
+
+#v2
+#if [[ $HOSTNAME =~ t3*.mit.edu ]]
+#then
+#    mkdir -p ${BASE}/moriond17/$PROCESS
+#    chmod 777 ${BASE}/moriond17/$PROCESS
+#    cp ${outfilename}_miniaod.root ${BASE}/moriond17/$PROCESS
+#elif which lcg-cp
+#then
+#    lcg-cp -v -D srmv2 -b file://$PWD/${outfilename}_miniaod.root srm://t3serv006.mit.edu:8443/srm/v2/server?SFN=${BASE}/moriond17/$PROCESS/${outfilename}_miniaod.root
+#elif which gfal-copy
+#then
+#    gfal-copy file://$PWD/${outfilename}_miniaod.root srm://t3serv006.mit.edu:8443/srm/v2/server?SFN=${BASE}/moriond17/$PROCESS/${outfilename}_miniaod.root
+#else
+#    echo "No way to copy something."
+#    exit 1
+#fi
 
 echo "DONE."

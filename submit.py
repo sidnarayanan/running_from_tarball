@@ -8,7 +8,7 @@ workpath=getcwd()+'/'+str(argv[1])
 uid=getuid()
 
 nper = 7
-njobs = 6
+njobs = 8000
 
 
                   #(GLIDEIN_Site == "MIT_CampusFactory" && (BOSCOGroup == "paus" || BOSCOGroup == "bosco_cms") && HAS_CVMFS_cms_cern_ch) \
