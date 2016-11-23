@@ -18,7 +18,7 @@ cp inputs/aod_template.py ./submit/input/
 cp inputs/pu_files.py ./submit/input/
 
 #x509
-voms-proxy-init -voms cms
+voms-proxy-init -voms cms -valid 200:00
 cp /tmp/x509up_u$UID $SUBMIT_WORKDIR/x509up
 
 #creating tarball
