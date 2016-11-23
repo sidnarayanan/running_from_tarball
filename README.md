@@ -1,6 +1,6 @@
 # Running from Tarball
 
-This is a small tool to privately generate events for Moriond17 analyses.
+This is a small tool to privately generate MiniAOD events for Moriond17 analyses.
 
 ## Installation
 
