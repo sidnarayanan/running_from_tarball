@@ -7,9 +7,7 @@ logpath=getcwd()+'/logs/'
 workpath=getcwd()+'/'+str(argv[1])
 uid=getuid()
 
-nper = 7
 njobs = argv[2]
-
 
                   #(GLIDEIN_Site == "MIT_CampusFactory" && (BOSCOGroup == "paus" || BOSCOGroup == "bosco_cms") && HAS_CVMFS_cms_cern_ch) \
 classad='''
@@ -33,7 +31,7 @@ requirements = ( \
                 ) && \ 
                 ( isUndefined(GLIDEIN_Site) || !stringListMember(GLIDEIN_Site,"SU-OG,HOSTED_BOSCO_CE",",") )
 rank = Mips
-arguments = $(Process) {4}
+arguments = $(Process) 
 use_x509userproxy = True
 x509userproxy = /tmp/x509up_u{2}
 #on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)
@@ -42,7 +40,7 @@ x509userproxy = /tmp/x509up_u{2}
 +ProjectName = "CpDarkMatterSimulation"
 +DESIRED_Sites = "T3_US_SDSC,T2_FR_GRIF_LLR,T3_US_Omaha,T2_CH_CERN_AI,T2_IT_Bari,T2_CH_CERN,T2_CH_CSCS,T2_UA_KIPT,T2_IN_TIFR,T2_FR_IPHC,T2_IT_Rome,T2_UK_London_Brunel,T2_EE_Estonia,T2_US_Florida,T2_US_Wisconsin,T2_HU_Budapest,T2_DE_RWTH,T2_BR_UERJ,T2_ES_IFCA,T2_DE_DESY,T2_US_Caltech,T2_TW_Taiwan,T0_CH_CERN,T1_RU_JINR_Disk,T2_UK_London_IC,T2_US_Nebraska,T2_ES_CIEMAT,T3_US_Princeton,T2_PK_NCP,T2_CH_CERN_T0,T3_US_FSU,T3_KR_UOS,T3_IT_Perugia,T3_US_Minnesota,T2_TR_METU,T2_AT_Vienna,T2_US_Purdue,T3_US_Rice,T3_HR_IRB,T2_BE_UCL,T3_US_FIT,T2_UK_SGrid_Bristol,T2_PT_NCG_Lisbon,T1_ES_PIC,T3_US_JHU,T2_IT_Legnaro,T2_RU_INR,T3_US_FIU,T3_EU_Parrot,T2_RU_JINR,T2_IT_Pisa,T3_UK_ScotGrid_GLA,T3_US_MIT,T2_CH_CERN_HLT,T2_MY_UPM_BIRUNI,T1_FR_CCIN2P3,T2_FR_GRIF_IRFU,T2_FR_CCIN2P3,T2_PL_Warsaw,T3_AS_Parrot,T2_US_MIT,T2_BE_IIHE,T2_RU_ITEP,T1_CH_CERN,T3_CH_PSI,T3_IT_Bologna"
 queue {3}
-'''.format(workpath,logpath,uid,njobs,nper)
+'''.format(workpath,logpath,uid,njobs)
 
 
 with open(logpath+'/condor.jdl','w') as jdlfile:

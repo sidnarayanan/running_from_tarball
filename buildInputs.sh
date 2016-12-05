@@ -10,6 +10,16 @@ echo "TARBALL=${1}_tarball.tar.xz" > ./submit/inputs.sh
 echo "HADRONIZER=${1}_hadronizer.py" >> ./submit/inputs.sh
 echo "PROCESS=${1}" >> ./submit/inputs.sh
 echo "USERNAME=${USER}" >> ./submit/inputs.sh
+
+if [ -z "$2" ]
+    then
+    echo "MERGE=0" >> ./submit/inputs.sh
+    echo "You want to produce events for $1. Good luck!"
+else
+    echo "MERGE=1" >> ./submit/inputs.sh
+    echo "You want to merge the T2 files for $1? Ok."
+fi
+
 mkdir -p ./submit/input/
 cp inputs/${1}_tarball.tar.xz ./submit/input/
 cp inputs/${1}_hadronizer.py ./submit/input/
@@ -18,7 +28,7 @@ cp inputs/aod_template.py ./submit/input/
 cp inputs/pu_files.py ./submit/input/
 
 #x509
-voms-proxy-init -voms cms -valid 200:00
+voms-proxy-init -voms cms -valid 172:00
 cp /tmp/x509up_u$UID $SUBMIT_WORKDIR/x509up
 
 #creating tarball
