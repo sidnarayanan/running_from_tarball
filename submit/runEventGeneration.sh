@@ -82,7 +82,7 @@ bottom_linenumber=$((total_linenumber - $linenumber ))
 tail -n $bottom_linenumber ${outfilename}_gensim.py > tail.py
 head -n $linenumber ${outfilename}_gensim.py > head.py
 echo "    firstRun = cms.untracked.uint32(1)," >> head.py
-echo "    firstLuminosityBlock = cms.untracked.uint32($RANDOM)," >> head.py
+echo "    firstLuminosityBlock = cms.untracked.uint32($RANDOMSEED)," >> head.py
 cat tail.py >> head.py
 mv head.py ${outfilename}_gensim.py
 rm tail.py
