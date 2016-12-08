@@ -45,20 +45,19 @@ sed -i 's/exit 0//g' runcmsgrid.sh
 
 ls -lhrt
 
-#RANDOMSEED=`od -vAn -N4 -tu4 < /dev/urandom`
-#RANDOMSEED=${RANDOM}
+RANDOMSEED=`od -vAn -N4 -tu4 < /dev/urandom`
 
-RANDOMSEED1=${RANDOM}
-RANDOMSEED2=${RANDOM}
+#RANDOMSEED1=${RANDOM}
+#RANDOMSEED2=${RANDOM}
 
-RANDOMSEED="$((RANDOMSEED1 * RANDOMSEED2))"
+#RANDOMSEED="$((RANDOMSEED1 * RANDOMSEED2))"
 
-if [ ${#RANDOMSEED} -gt "4" ];then
-    RANDOMSEED=`echo $RANDOMSEED | rev | cut -c 4- | rev`
-fi
+#if [ ${#RANDOMSEED} -gt "4" ];then
+RANDOMSEED=`echo $RANDOMSEED | rev | cut -c 3- | rev`
+#fi
 
-. runcmsgrid.sh 250 ${RANDOMSEED} 1
-
+#Run
+. runcmsgrid.sh 300 ${RANDOMSEED} 1
 
 outfilename_tmp="$PROCESS"'_'"$RANDOMSEED"
 outfilename="${outfilename_tmp//[[:space:]]/}"
@@ -74,6 +73,21 @@ ls -lhrt
 
 cmsDriver.py Configuration/GenProduction/python/${HADRONIZER} --filein file:${outfilename}.lhe --fileout file:${outfilename}_gensim.root --mc --eventcontent RAWSIM --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1,Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --conditions MCRUN2_71_V1::All --beamspot Realistic50ns13TeVCollision --step GEN,SIM --magField 38T_PostLS1 --python_filename ${outfilename}_gensim.py --no_exec -n 1000
 
+
+#Make each file unique to later publication possible
+linenumber=`grep -n 'process.source' ${outfilename}_gensim.py | awk '{print $1}'`
+linenumber=${linenumber%:*}
+total_linenumber=`cat ${outfilename}_gensim.py | wc -l`
+bottom_linenumber=$((total_linenumber - $linenumber ))
+tail -n $bottom_linenumber ${outfilename}_gensim.py > tail.py
+head -n $linenumber ${outfilename}_gensim.py > head.py
+echo "    firstRun = cms.untracked.uint32(1)," >> head.py
+echo "    firstLuminosityBlock = cms.untracked.uint32($RANDOMSEED)," >> head.py
+cat tail.py >> head.py
+mv head.py ${outfilename}_gensim.py
+rm tail.py
+
+#Run
 cmsRun ${outfilename}_gensim.py
 
 #
@@ -99,6 +113,7 @@ cmsRun ${outfilename}_1_cfg.py
 
 cmsDriver.py step2 --filein file:${outfilename}_step1.root --fileout file:${outfilename}_aod.root --mc --eventcontent AODSIM --runUnscheduled --datatier AODSIM --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --step RAW2DIGI,RECO,EI --nThreads 1 --era Run2_2016 --python_filename ${outfilename}_2_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n 1000
 
+#Run
 cmsRun ${outfilename}_2_cfg.py
 
 #
@@ -108,6 +123,7 @@ cmsRun ${outfilename}_2_cfg.py
 
 cmsDriver.py step1 --filein file:${outfilename}_aod.root --fileout file:${outfilename}_miniaod.root --mc --eventcontent MINIAODSIM --runUnscheduled --datatier MINIAODSIM --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --step PAT --nThreads 1 --era Run2_2016 --python_filename ${outfilename}_miniaod_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n 1000
 
+#Run
 cmsRun ${outfilename}_miniaod_cfg.py
 
 
