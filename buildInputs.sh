@@ -1,5 +1,7 @@
 #!/bin/bash
 
+
+export TARBALLDIR="/work/bmaier/production/running_from_tarball"
 export BASEDIR=${PWD}
 rm -r work_${1}
 mkdir work_${1}
@@ -21,8 +23,8 @@ else
 fi
 
 mkdir -p ./submit/input/
-cp inputs/${1}_tarball.tar.xz ./submit/input/
-cp inputs/${1}_hadronizer.py ./submit/input/
+cp ${TARBALLDIR}/inputs/${1}_tarball.tar.xz ./submit/input/
+cp ${TARBALLDIR}/inputs/${1}_hadronizer.py ./submit/input/
 cp inputs/copy.tar ./submit/input/
 cp inputs/aod_template.py ./submit/input/
 cp inputs/pu_files.py ./submit/input/
