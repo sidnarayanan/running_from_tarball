@@ -3,8 +3,24 @@
 
 export TARBALLDIR="/work/bmaier/production/running_from_tarball"
 export BASEDIR=${PWD}
-rm -r work_${1}
+
+# sanity check - does the input exist? if not, fail
+INPUTTAR=${TARBALLDIR}/inputs/${1}_tarball.tar.xz
+INPUTHAD=${TARBALLDIR}/inputs/${1}_hadronizer.py
+if [ ! -f ${INPUTTAR} ]
+then
+  echo "ERROR: could not find ${INPUTTAR}"
+  exit 1
+fi
+if [ ! -f ${INPUTHAD} ]
+then
+  echo "ERROR: could not find ${INPUTHAD}"
+  exit 1
+fi
+
+rm -rf work_${1}
 mkdir work_${1}
+mkdir -p logs
 export SUBMIT_WORKDIR=${PWD}/work_${1}
 
 #copying necessary inputs
@@ -23,8 +39,8 @@ else
 fi
 
 mkdir -p ./submit/input/
-cp ${TARBALLDIR}/inputs/${1}_tarball.tar.xz ./submit/input/
-cp ${TARBALLDIR}/inputs/${1}_hadronizer.py ./submit/input/
+cp ${INPUTTAR} ./submit/input/
+cp ${INPUTHAD} ./submit/input/
 cp inputs/copy.tar ./submit/input/
 cp inputs/aod_template.py ./submit/input/
 cp inputs/pu_files.py ./submit/input/
